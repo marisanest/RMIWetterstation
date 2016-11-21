@@ -34,21 +34,18 @@ public class WetterstationClient extends UnicastRemoteObject implements Wetterst
 	
 	public static void main(String args[]) {
         
-//		if (System.getSecurityManager() == null) {
-//            System.setSecurityManager(new SecurityManager());
-//        }
+		if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
 		
         try {
             String name = "Wetterstation";
             Registry registry = LocateRegistry.getRegistry("localhost", 1099);
             Wetterstation server = (Wetterstation) registry.lookup(name);
-            
             WetterstationClientInterface client = new WetterstationClient();
-            server.register(client);
-            System.out.println("Client wurde registriert");
-           
+            
             while(true)
-            	interact(server);
+            	interact(server, client);
            
         } catch (Exception e) {
             System.err.println("WetterstationClient exception:");
@@ -56,33 +53,39 @@ public class WetterstationClient extends UnicastRemoteObject implements Wetterst
         }
     }  
 	
-	private static void interact(Wetterstation server) throws IOException {
+	private static void interact(Wetterstation server, WetterstationClientInterface client) throws IOException {
 		
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 		
-		System.out.println("Was wollen sie tun?");
+		System.out.println();
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		System.out.println("                 Was wollen sie tun?");
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("a : Anfrage an Server");
 		System.out.println("r : Beim Server registrieren");
 		System.out.println("u : Beim Server abmelden");
 		System.out.println("q : Dienst quittieren");
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		System.out.println();
 		
 		String response = stdIn.readLine();
 		
 		if(response.equals("a")) {
 			requestServer(server);
 		}
-//		else if(response.equals("r")) {
-//			WetterstationClientInterface client = new WetterstationClient();
-//            server.register(client);
-//            System.out.println("Client wurde registriert");
-//		}
-//		else if(response.equals("u")) {
-//			WetterstationClientInterface client = new WetterstationClient();
-//			server.unregister(client);
-//		    System.out.println("Client wurd abgemeldet");
-//		} 
-		else if(response.equals("q"))
+		else if(response.equals("r")) {
+            server.register(client);
+            System.out.println("Client wurde erfolgreich registriert...");
+		}
+		else if(response.equals("u")) {
+            server.unregister(client);
+            System.out.println("Client wurde erfolgreich abgemeldet...");
+		}
+		else if(response.equals("q")){
+			server.unregister(client);
+			System.out.println("Client wurde erfolgreich abgemeldet...");
 			System.exit(0);
+		}
 	}
 	
 	private static void requestServer(Wetterstation server) throws IOException{
@@ -166,15 +169,22 @@ public class WetterstationClient extends UnicastRemoteObject implements Wetterst
 				if(tempArr.get(i).getId() == temp.getId())
 					tempArr.get(i).setTemp(temp.getTemp());
 			}
+			
+			System.out.println();
+			System.out.println("***********************Zwischen Meldung***********************");
 			System.out.println("Es haben sich Temperaturen geändert! Folgendes sind die aktualisierten Daten:");
 			showTemperatures(date, dates.get(date));
+			System.out.println("***********************Zwischen Meldung***********************");
+			System.out.println();
 		}
 	}
 	
 	public static void showTemperatures(Date date, ArrayList<TempPoint> temps) {
-		System.out.println(date+": "+temps);
-        System.out.println("Durchschnittliche Temperatur " + calcAverage(temps));
-        System.out.println("Minimal Temperatur " + calcMin(temps));
-	    System.out.println("Maximal Temperatur " + calcMax(temps));
+		System.out.println("***************"+date+"**************");
+		System.out.println("Temperaturen: "+temps);
+        System.out.println("Durchschnittliche Temperatur: " + calcAverage(temps));
+        System.out.println("Minimal Temperatur: " + calcMin(temps));
+	    System.out.println("Maximal Temperatur: " + calcMax(temps));
+	    System.out.println("**********************************************************");
 	}
 }

@@ -41,20 +41,20 @@ public class WetterstationEngine implements Wetterstation {
 	}
 	
 	public static void main(String[] args) {
-//        if (System.getSecurityManager() == null) {
-//            System.setSecurityManager(new SecurityManager());
-//        }
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
         try {
             String name = "Wetterstation";
             Wetterstation engine = new WetterstationEngine();
             Wetterstation stub = (Wetterstation) UnicastRemoteObject.exportObject(engine, 0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.rebind(name, stub);
-            System.out.println("WetterstationEngine bound");
+            System.out.println("WetterstationEngine bound...");
             
             try {
     			dates = parseCSV("/Users/admin/Git/Wetterstation/Temperaturen.csv");
-    			System.out.println("Weather data fetched");
+    			System.out.println("Weather data fetched...");
     		} catch (FileNotFoundException e) {
     			System.err.println("CSVFile exception:");
     			e.printStackTrace();
@@ -121,42 +121,49 @@ public class WetterstationEngine implements Wetterstation {
 		return str.replaceAll("\\s+","").replaceAll("\\n+","").replaceAll("\\r+","").replaceAll("\\t+","").replaceAll("\\b+","").replaceAll("\\f+","");
 	}
 
-	public synchronized void register(WetterstationClientInterface client) throws RemoteException{
+	public synchronized void register(WetterstationClientInterface client) throws RemoteException {
 		if (!(clientList.contains(client))) {
 			clientList.addElement(client);
-			System.out.println("Neuer Client wurde registriert");
+			System.out.println("Neuer Client wurde erfolgreich registriert...");
 		}
 		else
-			System.out.println("Client war bereits registriert");
+			System.out.println("Client war bereits registriert...");
 	}  
 
-	public synchronized void unregister(WetterstationClientInterface client) throws RemoteException{
+	public synchronized void unregister(WetterstationClientInterface client) throws RemoteException {
 		if (clientList.removeElement(client))
-			System.out.println("Client wurde abgemeldet");
+			System.out.println("Client wurde abgemeldet...");
 		else
-			System.out.println("Client ist nicht registriert");
+			System.out.println("Client ist nicht registriert...");
 	} 
 
-	private static synchronized void callback(Date date, TempPoint temp) throws RemoteException{
+	private static synchronized void callback(Date date, TempPoint temp) throws RemoteException {
 		
-		System.out.println( "********************Callback beginnt********************");
+		System.out.println();
+		System.out.println( "*********************Callback beginnt*********************");
 		
 		for (int i = 0; i < clientList.size(); i++){
-			System.out.println("Callback Nummer "+ i +"...");    
+			System.out.println("Callback Nummer "+ i+1 +"...");    
 			WetterstationClientInterface client = (WetterstationClientInterface)clientList.elementAt(i);
 			client.updateTemperatures(date, temp);
 		}
 		
-		System.out.println("********************Callback beendet********************");
+		System.out.println("*********************Callback beendet*********************");
+		System.out.println();
 	}
 	
 	private static void interact() throws IOException{
 		
 		BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 		
-		System.out.println("Was wollen sie tun?");
+		System.out.println();
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		System.out.println("                  Was wollen sie tun?");
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
 		System.out.println("a : Aenderungen an den Temperaturen vornehmen");
 		System.out.println("q : Dienst quittieren");
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+		System.out.println();
 		
 		String response = stdIn.readLine();
 		
@@ -185,11 +192,11 @@ public class WetterstationEngine implements Wetterstation {
 			double temp = Double.parseDouble(strArr[2]);
 			
 			insertTemperatures(date, hour, temp);
-			System.out.println("Angaben wurde erfolgreich hinzugefügt oder aktualisiert");
+			System.out.println("Eintrag wurde erfolgreich hinzugefügt oder aktualisiert!");
 			callback(date, new TempPoint(hour, temp));
 				
 		} catch (Exception e) {
-			System.out.println("Angaben wurden im falschem Format angegeben!");
+			System.out.println("Angaben sind im falschem Format!");
 		}
 	}
 	
