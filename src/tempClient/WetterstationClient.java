@@ -51,7 +51,7 @@ public class WetterstationClient extends UnicastRemoteObject implements Wetterst
             		System.err.println("WetterstationClient exception:");
             		e.printStackTrace();
         	}
-    }  
+    	}  
 	
 	private static void interact(Wetterstation server, WetterstationClientInterface client) throws IOException {
 		
