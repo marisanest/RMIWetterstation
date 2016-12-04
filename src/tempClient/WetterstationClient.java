@@ -35,22 +35,22 @@ public class WetterstationClient extends UnicastRemoteObject implements Wetterst
 	public static void main(String args[]) {
         
 		if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
+            		System.setSecurityManager(new SecurityManager());
+        	}
 		
-        try {
-            String name = "Wetterstation";
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            Wetterstation server = (Wetterstation) registry.lookup(name);
-            WetterstationClientInterface client = new WetterstationClient();
+       		try {
+            		String name = "Wetterstation";
+            		Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+            		Wetterstation server = (Wetterstation) registry.lookup(name);
+            		WetterstationClientInterface client = new WetterstationClient();
             
-            while(true)
-            	interact(server, client);
+            		while(true)
+            			interact(server, client);
            
-        } catch (Exception e) {
-            System.err.println("WetterstationClient exception:");
-            e.printStackTrace();
-        }
+        	} catch (Exception e) {
+            		System.err.println("WetterstationClient exception:");
+            		e.printStackTrace();
+        	}
     }  
 	
 	private static void interact(Wetterstation server, WetterstationClientInterface client) throws IOException {
