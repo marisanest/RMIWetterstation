@@ -1,1 +1,1 @@
-# RMIWetterstation
+# distributed-sys-rmi
